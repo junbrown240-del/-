@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>한글날 가족 게임</title>
+    <meta
+      name="description"
+      content="한글날 분위기에 맞춘 초성 단어 릴레이 가족 게임 웹 앱"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="brand-wrap">
+          <div class="seal-mark">한</div>
+          <div>
+            <p class="eyebrow">한국 전통 놀이</p>
+            <h1>한글날 가족 게임</h1>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button id="restartGameBtn" class="ghost-btn secondary" type="button">
+            다시 시작
+          </button>
+          <button id="startRankingBtn" class="primary-btn ranking-start-btn" type="button">
+            순위 발표 시작
+          </button>
+          <button id="resetScoresBtn" class="ghost-btn" type="button">
+            점수 초기화
+          </button>
+        </div>
+      </header>
+
+      <nav class="phase-tabs" aria-label="게임 파트 선택">
+        <button class="phase-tab active" type="button" data-part="1">
+          1파트 초성 릴레이
+        </button>
+        <button class="phase-tab" type="button" data-part="2">
+          2파트 우리말 변환왕
+        </button>
+        <button class="phase-tab" type="button" data-part="3">
+          3파트 맞춤법 & 띄어쓰기 퀴즈
+        </button>
+        <button class="phase-tab" type="button" data-part="4">
+          4파트 진짜 VS 가짜 우리말
+        </button>
+      </nav>
+
+      <main class="app-grid">
+        <div id="part1Layout" class="part-layout">
+          <section class="panel game-panel">
+            <div class="round-picker" id="roundPicker" aria-label="라운드 선택">
+              <button class="round-btn active" type="button" data-round="0">
+                <span class="round-name">1라운드 쉬움</span>
+                <span class="round-point">(1점)</span>
+              </button>
+              <button class="round-btn" type="button" data-round="1">
+                <span class="round-name">2라운드 보통</span>
+                <span class="round-point">(2점)</span>
+              </button>
+              <button class="round-btn" type="button" data-round="2">
+                <span class="round-name">3라운드 어려움</span>
+                <span class="round-point">(3점)</span>
+              </button>
+            </div>
+
+            <div class="game-status-row">
+              <div class="deck-card-count" aria-live="polite">
+                <span class="label">남은 초성 카드</span>
+                <div class="timer-value-wrap">
+                  <strong id="remainingCards">0</strong>
+                  <span>장</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="syllable-frame">
+              <span class="frame-tag">초성 카드</span>
+              <div id="syllableDisplay" class="syllable-display" aria-live="polite">
+                <span class="syllable-char">ㄱ</span>
+                <span class="syllable-char">ㅁ</span>
+              </div>
+            </div>
+
+            <div class="action-row">
+              <button id="nextSyllableBtn" class="primary-btn" type="button">
+                다음 초성
+              </button>
+              <button id="correctBtn" class="highlight-btn" type="button">
+                정답 맞힘
+              </button>
+            </div>
+
+            <div id="teamPicker" class="team-picker hidden" aria-live="polite">
+              <p>점수 반영 팀을 선택해 주세요.</p>
+              <div id="teamButtons" class="team-buttons"></div>
+            </div>
+          </section>
+
+          <aside class="panel sidebar">
+            <div class="team-config">
+              <label for="teamCountInput">팀 개수</label>
+              <div class="team-config-row">
+                <input id="teamCountInput" type="number" min="2" max="10" value="4" />
+                <button id="applyTeamCountBtn" class="small-btn" type="button">적용</button>
+              </div>
+            </div>
+
+            <div class="scoreboard only-scoreboard">
+              <div class="section-title">점수판</div>
+              <div id="teamList" class="team-list"></div>
+            </div>
+
+          </aside>
+        </div>
+
+        <section id="part2Layout" class="part-layout hidden">
+          <div class="part2-panel panel" aria-live="polite">
+            <div class="part2-header">
+              <div>
+                <span class="part2-badge">2파트</span>
+                <h2>외래어/한자어 우리말 변환왕</h2>
+              </div>
+              <div class="word-progress">
+                <span id="wordProgress">1</span>
+                <span class="divider">/</span>
+                <span id="wordTotal">8</span>
+              </div>
+            </div>
+
+            <div class="word-card-wrap">
+              <div class="word-card">
+                <span class="word-label">제시어</span>
+                <div id="foreignWord" class="foreign-word">노트북</div>
+              </div>
+            </div>
+
+            <div class="part2-controls">
+              <button id="prevWordBtn" class="secondary-btn" type="button">이전 문제</button>
+              <button id="nextWordBtn" class="primary-btn" type="button">다음 문제</button>
+            </div>
+
+            <button id="showAnswerBtn" class="answer-toggle" type="button">
+              예시 정답 보기
+            </button>
+
+            <div id="answerPanel" class="answer-panel hidden" aria-live="polite">
+              <div class="answer-header">예시 표현</div>
+              <ul id="exampleList" class="example-list"></ul>
+            </div>
+
+            <div class="score-quick">
+              <div class="score-quick-header">팀에게 점수 주기</div>
+              <div id="participantButtons" class="participant-buttons"></div>
+            </div>
+
+            <div id="scoreToast" class="score-toast hidden" aria-live="polite"></div>
+          </div>
+
+          <aside class="panel part2-sidebar">
+            <div class="part2-scoreboard-wrap">
+              <div class="part2-scoreboard-title">팀 점수판</div>
+              <div class="scoreboard part2-team-board only-scoreboard">
+                <div id="part2TeamList" class="team-list"></div>
+              </div>
+            </div>
+          </aside>
+        </section>
+
+        <section id="part3Layout" class="part-layout hidden">
+          <div class="part3-panel panel" aria-live="polite">
+            <div class="part3-header">
+              <div>
+                <span class="part3-badge">3파트</span>
+                <h2>초스피드 문자 맞춤법 &amp; 띄어쓰기 퀴즈</h2>
+              </div>
+              <div class="part3-progress">
+                <span id="part3Progress">1</span>
+                <span class="divider">/</span>
+                <span id="part3Total">5</span>
+              </div>
+            </div>
+
+            <div class="part3-instruction">
+              진행자 번호로 가장 먼저 정확한 문자를 보내세요!
+            </div>
+
+            <div class="part3-topbar">
+              <label class="host-number-wrap">
+                <span>진행자 번호</span>
+                <input id="hostNumberInput" type="number" min="1" max="99" value="1" />
+              </label>
+
+              <div class="part3-timer-wrap">
+                <div class="part3-timer-label">제한 시간</div>
+                <div class="part3-timer-options">
+                  <button type="button" class="timer-option active" data-part3-seconds="30">30초</button>
+                  <button type="button" class="timer-option" data-part3-seconds="60">60초</button>
+                </div>
+                <div class="part3-timer-display">
+                  <span id="part3TimerValue">30</span>
+                  <span>초</span>
+                </div>
+                <button id="startPart3TimerBtn" class="primary-btn" type="button">카운트다운 시작</button>
+              </div>
+            </div>
+
+            <div class="part3-card">
+              <div class="part3-card-header">
+                <span>제시 문장</span>
+                <button id="part3ListenSentenceBtn" type="button" class="listen-btn" data-speech-text="">
+                  🔊 소리로 듣기
+                </button>
+              </div>
+              <div id="part3Sentence" class="part3-sentence"></div>
+            </div>
+
+            <div class="part3-controls">
+              <button id="prevPart3Btn" class="secondary-btn" type="button">이전 문제</button>
+              <button id="nextPart3Btn" class="primary-btn" type="button">다음 문제</button>
+            </div>
+
+            <div class="part3-answer-row">
+              <button id="showPart3AnswerBtn" class="answer-toggle" type="button">
+                정답 보기
+              </button>
+            </div>
+
+            <div id="part3AnswerPanel" class="part3-answer-panel hidden" aria-live="polite">
+              <div class="answer-header">정답</div>
+              <div class="part3-answer-box">
+                <div id="part3AnswerText" class="part3-answer-text"></div>
+                <button id="part3ListenAnswerBtn" type="button" class="listen-btn" data-speech-text="">
+                  🔊 정답 듣기
+                </button>
+              </div>
+              <div class="part3-points-box">
+                <div class="part3-points-title">출제 포인트</div>
+                <ul id="part3PointsList" class="part3-points-list"></ul>
+              </div>
+            </div>
+
+            <div class="score-quick">
+              <div class="score-quick-header">팀에게 점수 주기</div>
+              <div id="part3ParticipantButtons" class="participant-buttons"></div>
+            </div>
+
+            <div id="part3ScoreToast" class="score-toast hidden" aria-live="polite"></div>
+          </div>
+
+          <aside class="panel part3-sidebar">
+            <div class="part3-scoreboard-wrap">
+              <div class="part3-scoreboard-title">팀 점수판</div>
+              <div class="scoreboard part3-team-board only-scoreboard">
+                <div id="part3TeamList" class="team-list"></div>
+              </div>
+            </div>
+          </aside>
+        </section>
+
+        <section id="part4Layout" class="part-layout hidden">
+          <div class="part4-panel panel" aria-live="polite">
+            <div class="part4-header">
+              <div>
+                <span class="part4-badge">4파트</span>
+                <h2>진짜 VS 가짜 우리말 구별하기</h2>
+              </div>
+              <div class="part4-progress">
+                <span id="part4Progress">1</span>
+                <span class="divider">/</span>
+                <span id="part4Total">10</span>
+              </div>
+            </div>
+
+            <div class="part4-quiz-label" id="part4QuestionLabel">야단법석 vs 야단시끌</div>
+
+            <div id="part4CardGrid" class="part4-card-grid"></div>
+
+            <div class="part4-controls">
+              <button id="prevPart4Btn" class="secondary-btn" type="button">이전 문제</button>
+              <button id="revealPart4Btn" class="primary-btn" type="button">정답 확인</button>
+              <button id="nextPart4Btn" class="primary-btn" type="button">다음 문제</button>
+            </div>
+
+            <div id="part4AnswerBox" class="part4-answer-box hidden" aria-live="polite"></div>
+
+            <button id="togglePart4BoardBtn" class="secondary-btn" type="button">순위판 숨기기</button>
+
+            <div class="score-quick">
+              <div class="score-quick-header">팀에게 점수 주기</div>
+              <div id="part4ParticipantButtons" class="participant-buttons"></div>
+            </div>
+
+            <div id="part4ScoreToast" class="score-toast hidden" aria-live="polite"></div>
+          </div>
+
+          <aside id="part4Sidebar" class="panel part4-sidebar">
+            <div class="part4-scoreboard-wrap">
+              <div class="part4-scoreboard-title">팀 점수판</div>
+              <div class="scoreboard part4-team-board only-scoreboard">
+                <div id="part4TeamList" class="team-list"></div>
+              </div>
+            </div>
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <section id="rankingStage" class="ranking-stage hidden" role="dialog" aria-modal="true" aria-labelledby="rankingStageTitle">
+      <canvas id="confettiCanvas" class="confetti-canvas" aria-hidden="true"></canvas>
+      <div class="ranking-stage-content">
+        <button id="closeRankingBtn" class="ranking-close-btn" type="button" aria-label="순위 발표 닫기">×</button>
+        <p class="ranking-eyebrow">HANGUL DAY · FINAL RESULTS</p>
+        <h2 id="rankingStageTitle">최종 순위 발표</h2>
+        <p id="rankingAnnouncement" class="ranking-announcement" aria-live="polite"></p>
+        <ol id="rankingRevealList" class="ranking-reveal-list" aria-live="polite"></ol>
+        <button id="nextRankingBtn" class="primary-btn ranking-next-btn" type="button">다음 순위 공개</button>
+      </div>
+    </section>
+
+    <script src="script.js"></script>
+  </body>
+</html>
